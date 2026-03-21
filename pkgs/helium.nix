@@ -61,4 +61,8 @@ pkgs.appimageTools.wrapType2 {
       ];
     };
   };
+
+  meta = {
+    position = "${./helium.nix}:0";
+  };
 }

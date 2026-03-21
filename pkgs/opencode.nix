@@ -173,5 +173,6 @@ stdenvNoCC.mkDerivation (finalAttrs: {
       "x86_64-darwin"
     ];
     mainProgram = "opencode";
+    position = "${./opencode.nix}:0";
   };
 })

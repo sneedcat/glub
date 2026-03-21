@@ -28,6 +28,7 @@
       packages = forAllSystems (
         { pkgs }:
         {
+          default = pkgs.glub.packages.${pkgs.stdenv.system}.opencode;
           helium = pkgs.glub.packages.${pkgs.stdenv.system}.helium;
           opencode = pkgs.glub.packages.${pkgs.stdenv.system}.opencode;
         }
@@ -38,11 +39,11 @@
         {
           helium = {
             type = "app";
-            program = "${self.packages.${pkgs.system}.default}/bin/helium";
+            program = "${self.packages.${pkgs.stdenv.hostPlatform.system}.helium}/bin/helium";
           };
           opencode = {
             type = "app";
-            program = "${self.packages.${pkgs.system}.default}/bin/opencode";
+            program = "${self.packages.${pkgs.stdenv.hostPlatform.system}.opencode}/bin/opencode";
           };
         }
       );
