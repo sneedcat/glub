@@ -15,7 +15,7 @@
 }:
 stdenvNoCC.mkDerivation (finalAttrs: {
   pname = "opencode";
-  version = "1.2.21";
+  version = "1.2.27";
   src = fetchFromGitHub {
     owner = "anomalyco";
     repo = "opencode";
@@ -150,6 +150,7 @@ stdenvNoCC.mkDerivation (finalAttrs: {
     jsonschema = "${placeholder "out"}/share/opencode/schema.json";
     updateScript = nix-update-script {
       extraArgs = [
+        "--flake"
         "--subpackage"
         "node_modules"
       ];
