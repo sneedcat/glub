@@ -1,0 +1,78 @@
+name: Update package versions
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "0 6 * * *"
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install Nix
+        uses: DeterminateSystems/nix-installer-action@v15
+
+      - name: Enable Nix cache
+        uses: DeterminateSystems/magic-nix-cache-action@v7
+
+      - name: Update opencode and helium
+        id: update
+        run: |
+          set -euo pipefail
+
+          nix run nixpkgs#nix-update -- --flake --use-update-script opencode
+          nix run nixpkgs#nix-update -- --flake --use-update-script helium
+
+          if git diff --quiet; then
+            echo "packages_changed=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "packages_changed=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Update flake lock
+        if: steps.update.outputs.packages_changed == 'true'
+        run: nix flake update
+
+      - name: Build updated packages
+        if: steps.update.outputs.packages_changed == 'true'
+        run: |
+          set -euo pipefail
+
+          if [ -n "$(git diff --name-only -- pkgs/opencode.nix)" ]; then
+            nix build .#opencode
+          fi
+
+          if [ -n "$(git diff --name-only -- pkgs/helium.nix)" ]; then
+            nix build .#helium
+          fi
+
+      - name: Detect updates
+        id: detect
+        run: |
+          if git diff --quiet; then
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Create pull request
+        if: steps.detect.outputs.changed == 'true'
+        uses: peter-evans/create-pull-request@v6
+        with:
+          commit-message: "ci: update opencode, helium, and flake lock"
+          title: "ci: update opencode, helium, and flake lock"
+          body: |
+            Automated package and flake updates:
+            - checks latest upstream release for `opencode`
+            - checks latest upstream release for `helium`
+            - updates `flake.lock`
+          branch: ci/update-packages
+          delete-branch: true
