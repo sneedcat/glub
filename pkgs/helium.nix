@@ -2,11 +2,11 @@
 
 let
   pname = "helium";
-  version = "0.11.7.1";
+  version = "0.12.0.2";
 
   src = pkgs.fetchurl {
     url = "https://github.com/imputnet/helium-linux/releases/download/${version}/helium-${version}-x86_64.AppImage";
-    sha256 = "sha256-qzc135IP5F2btxtOMUGMz+0azJhYL9KI0lcPG2KjcxU=";
+    sha256 = "sha256-1iU+hhisAPF2hAgfFob6Oe54JXjwb6uftiERa4t+OoE=";
   };
 
   appImageContents = pkgs.appimageTools.extract {
