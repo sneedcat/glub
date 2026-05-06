@@ -6,6 +6,7 @@
   fetchpatch,
   makeBinaryWrapper,
   models-dev,
+  nodejs,
   nix-update-script,
   ripgrep,
   sysctl,
@@ -19,8 +20,8 @@ stdenvNoCC.mkDerivation (finalAttrs: {
   src = fetchFromGitHub {
     owner = "anomalyco";
     repo = "opencode";
-    rev = "a52d640c8c56a5d9fb4623a1c601046c3d9a37b7";
-    hash = "sha256-XCf0ijRZZjp16YS9V65ZMoQzTWYRUrle3L4vWIxvy3M=";
+    rev = "v1.14.39";
+    hash = "sha256-PeLARnAFsbdrm9gsDzAdJcP74QBT8IgJupu8Z4xYbPo=";
   };
 
   node_modules = stdenvNoCC.mkDerivation {
@@ -68,7 +69,7 @@ stdenvNoCC.mkDerivation (finalAttrs: {
     # NOTE: Required else we get errors that our fixed-output derivation references store paths
     dontFixup = true;
 
-    outputHash = "sha256-dqYSXuZlDWoCQkGqcrNl7Y0m5HrPSbTVTebK+bpfJmg=";
+    outputHash = "sha256-i+hN4+gD/xG1Ue8/EIDmgZY6bXQr1yPHS014EgF8E3Y=";
     outputHashAlgo = "sha256";
     outputHashMode = "recursive";
   };
@@ -78,6 +79,7 @@ stdenvNoCC.mkDerivation (finalAttrs: {
     installShellFiles
     makeBinaryWrapper
     models-dev
+    nodejs
     writableTmpDirAsHomeHook
   ];
 
@@ -92,6 +94,8 @@ stdenvNoCC.mkDerivation (finalAttrs: {
     runHook preConfigure
 
     cp -R ${finalAttrs.node_modules}/. .
+
+    patchShebangs packages/app/node_modules/vite/bin packages/app/node_modules/electron-vite/bin 2>/dev/null || true
 
     runHook postConfigure
   '';
